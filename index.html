@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Is Pathology Right for You? | A Careers in Pathology Quiz</title>
+<meta name="description" content="A 7-question personality quiz: are you a Medical Detective, a Healer, an Architect or a Storyteller?">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400..700&family=Nunito+Sans:wght@400;600;700&display=swap">
+<style>
+  :root {
+    --navy: #1F1B3A;
+    --cream: #FBF7F0;
+    --card: #FFFDF9;
+    --line: #E7DFD0;
+    --body: #4A4560;
+    --soft: #D9D3E8;
+    --pink: #F4A6C4;
+    --det: #5B3FA8;
+    --heal: #C2410C;
+    --arch: #1F7A7A;
+    --story: #B5175A;
+    --radius: 24px;
+    --display: 'Fredoka', Verdana, sans-serif;
+    --text: 'Nunito Sans', Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    font-family: var(--text);
+    background: var(--cream);
+    color: var(--navy);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    -webkit-font-smoothing: antialiased;
+  }
+  body.dark { background: var(--navy); color: var(--cream); }
+  main { flex: 1; width: 100%; max-width: 1160px; margin: 0 auto; padding: 48px 28px 32px; }
+  h1, h2, h3 { font-family: var(--display); font-weight: 600; margin: 0; line-height: 1.1; }
+  h1:focus, h2:focus { outline: none; }
+  p { margin: 0; }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  .eyebrow { font-size: 15px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--det); }
+  body.dark .eyebrow { color: var(--pink); }
+  .fade { animation: fade .35s ease both; }
+  @keyframes fade { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .fade { animation: none; } .bar-fill { transition: none !important; } }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    border: 0; border-radius: 999px; padding: 18px 34px;
+    font-family: var(--display); font-weight: 600; font-size: 22px;
+    background: var(--cream); color: var(--navy);
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(20,16,40,.25); }
+  .btn:focus-visible, .answer:focus-visible, .chip:focus-visible, .link-btn:focus-visible { outline: 4px solid var(--pink); outline-offset: 3px; }
+  .btn.primary { background: var(--det); color: var(--cream); }
+  .btn.ghost { background: transparent; border: 2px solid currentColor; }
+  .link-btn { background: none; border: 0; padding: 8px 4px; font-weight: 700; font-size: 17px; color: var(--body); text-decoration: underline; text-underline-offset: 4px; }
+
+  /* Start */
+  .start { display: flex; flex-direction: column; gap: 28px; padding-top: 6vh; }
+  .start h1 { font-size: clamp(52px, 9vw, 112px); line-height: 1.02; }
+  .start .lede { font-size: clamp(20px, 2.6vw, 28px); color: var(--soft); max-width: 760px; line-height: 1.4; }
+  .tiles { display: flex; gap: 16px; flex-wrap: wrap; margin: 8px 0 12px; }
+  .tile { width: 76px; height: 76px; border-radius: 20px; display: grid; place-items: center; }
+  .tile svg { width: 40px; height: 40px; }
+  .start .actions { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
+  .hint { font-size: 16px; color: var(--soft); }
+
+  /* Question */
+  .topbar { display: flex; align-items: center; gap: 18px; margin-bottom: 36px; }
+  .progress { flex: 1; height: 12px; background: var(--line); border-radius: 999px; overflow: hidden; }
+  .progress span { display: block; height: 100%; background: var(--det); border-radius: 999px; transition: width .35s ease; }
+  .count { font-weight: 700; font-size: 16px; color: var(--body); white-space: nowrap; }
+  .question h2 { font-size: clamp(32px, 5vw, 60px); margin: 12px 0 36px; }
+  .answers { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .answer {
+    display: flex; align-items: center; gap: 22px; text-align: left;
+    background: var(--card); border: 2px solid var(--line); border-radius: var(--radius);
+    padding: 26px 28px; font-size: clamp(18px, 2vw, 23px); line-height: 1.35; color: var(--navy);
+    transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+  }
+  .answer:hover { transform: translateY(-3px); border-color: var(--det); box-shadow: 0 10px 28px rgba(31,27,58,.12); }
+  .answer.chosen { border-color: var(--det); background: #F1ECFB; }
+  .badge {
+    flex: none; width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center;
+    background: var(--navy); color: var(--cream); font-family: var(--display); font-weight: 600; font-size: 26px;
+  }
+  .answer.chosen .badge { background: var(--det); }
+  .qfoot { display: flex; justify-content: space-between; align-items: center; margin-top: 28px; gap: 12px; flex-wrap: wrap; }
+  .keys { font-size: 15px; color: var(--body); }
+  kbd { font-family: var(--text); font-weight: 700; background: var(--card); border: 1px solid var(--line); border-bottom-width: 3px; border-radius: 6px; padding: 1px 7px; }
+
+  /* Result */
+  .result-hero { border-radius: 32px; padding: 44px; color: var(--cream); display: flex; gap: 32px; align-items: center; }
+  .result-hero .icon { flex: none; width: 120px; height: 120px; border-radius: 30px; background: var(--cream); display: grid; place-items: center; }
+  .result-hero .icon svg { width: 68px; height: 68px; }
+  .result-hero .you { font-size: 15px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; opacity: .9; margin-bottom: 8px; }
+  .result-hero h1 { font-size: clamp(40px, 6vw, 72px); }
+  .result-hero .tagline { font-size: clamp(19px, 2.4vw, 26px); font-style: italic; margin-top: 10px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+  .panel { background: var(--card); border: 2px solid var(--line); border-radius: var(--radius); padding: 28px 32px; }
+  .panel h3 { font-family: var(--text); font-weight: 700; font-size: 15px; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 14px; }
+  .panel ul { margin: 0; padding-left: 22px; font-size: 19px; line-height: 1.55; color: var(--navy); }
+  .panel li + li { margin-top: 4px; }
+  .panel.full { margin-top: 20px; }
+  .mix { margin-top: 20px; }
+  .mix .row { display: grid; grid-template-columns: 150px 1fr 56px; gap: 16px; align-items: center; font-size: 18px; font-weight: 700; }
+  .mix .row + .row { margin-top: 12px; }
+  .bar { height: 16px; background: #EFE8DB; border-radius: 999px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 999px; width: 0; transition: width .8s ease; }
+  .mix .num { text-align: right; color: var(--body); font-variant-numeric: tabular-nums; }
+  .mix .note { margin-top: 16px; font-size: 17px; color: var(--body); line-height: 1.5; }
+  .explore { margin-top: 28px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  .explore .label { font-weight: 700; font-size: 17px; margin-right: 4px; }
+  .chip { border: 2px solid var(--line); background: var(--card); border-radius: 999px; padding: 10px 18px; font-weight: 700; font-size: 16px; display: inline-flex; align-items: center; gap: 8px; }
+  .chip .dot { width: 12px; height: 12px; border-radius: 50%; }
+  .chip[aria-pressed="true"] { border-color: var(--navy); background: var(--navy); color: var(--cream); }
+  .result-actions { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 32px; }
+  .result-actions .btn.ghost { color: var(--navy); }
+  .verdict { margin-top: 36px; background: var(--navy); color: var(--cream); border-radius: var(--radius); padding: 32px; display: flex; gap: 24px; align-items: center; }
+  .verdict h3 { font-size: 30px; margin-bottom: 6px; }
+  .verdict p { color: var(--soft); font-size: 18px; line-height: 1.5; }
+
+  footer { text-align: center; font-size: 14px; color: var(--body); padding: 20px; }
+  body.dark footer { color: var(--soft); }
+
+  @media (max-width: 760px) {
+    main { padding-top: 28px; }
+    .answers, .grid2 { grid-template-columns: 1fr; }
+    .result-hero { flex-direction: column; align-items: flex-start; padding: 32px; }
+    .result-hero .icon { width: 88px; height: 88px; border-radius: 22px; }
+    .result-hero .icon svg { width: 50px; height: 50px; }
+    .mix .row { grid-template-columns: 110px 1fr 44px; font-size: 16px; }
+    .keys { display: none; }
+    .verdict { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body class="dark">
+<main id="app" aria-live="polite"></main>
+<footer>Careers in Pathology · A just-for-fun personality quiz</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var ICONS = {
+    det: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg>',
+    heal: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12h4l3-8 5 16 3-8h4"/></svg>',
+    arch: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg>',
+    story: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 5h6a4 4 0 0 1 4 4v11a3 3 0 0 0-3-3H2z"/><path d="M22 5h-6a4 4 0 0 0-4 4v11a3 3 0 0 1 3-3h7z"/></svg>'
+  };
+
+  var TYPES = {
+    det: {
+      name: "The Medical Detective", short: "Detective", color: "var(--det)", hex: "#5B3FA8", slug: "detective",
+      tagline: "You can’t rest until the case is solved.",
+      traits: ["notices details everyone else misses", "lives for the “aha!” moment", "would rather be right than rushed"],
+      careers: ["Pathologist", "Forensic scientist", "Epidemiologist (a “disease detective”)", "Crime lab analyst"],
+      bandTitle: "What pathologists actually do",
+      band: ["<b>Surgical pathology:</b> diagnosing disease from biopsies under the microscope", "<b>Hematopathology:</b> cracking blood cancers like leukemia and lymphoma", "<b>Forensic pathology:</b> figuring out how and why someone died"]
+    },
+    heal: {
+      name: "The Healer", short: "Healer", color: "var(--heal)", hex: "#C2410C", slug: "healer",
+      tagline: "You’re happiest helping people face to face.",
+      traits: ["stays calm and steady when someone needs help", "loves hands-on, real-time work", "wants to see the difference you make"],
+      careers: ["Nurse", "Physician assistant (PA)", "Internal medicine or ER doctor", "Paramedic or physical therapist"],
+      bandTitle: "Try it out now",
+      band: ["Volunteer at a hospital, clinic or senior center", "Take a CPR or first-aid class", "Ask your school counselor about shadowing a nurse, PA or doctor"]
+    },
+    arch: {
+      name: "The Architect", short: "Architect", color: "var(--arch)", hex: "#1F7A7A", slug: "architect",
+      tagline: "You see the world as a system you can design.",
+      traits: ["loves logic, numbers and how things fit together", "would rather build a solution than guess", "gets a thrill when the math finally works"],
+      careers: ["Engineer (biomedical, civil, software)", "Mathematician or statistician", "Data scientist", "Architect"],
+      bandTitle: "Try it out now",
+      band: ["Join robotics, math team or a coding club", "Enter a science or engineering fair", "Take a free online course in coding, design or statistics"]
+    },
+    story: {
+      name: "The Storyteller", short: "Storyteller", color: "var(--story)", hex: "#B5175A", slug: "storyteller",
+      tagline: "You turn ideas and feelings into something people remember.",
+      traits: ["notices what makes people tick", "expresses yourself through words, art or performance", "wants your work to move people"],
+      careers: ["Writer or journalist", "Actor, musician or filmmaker", "Teacher or professor", "Lawyer or historian"],
+      bandTitle: "Try it out now",
+      band: ["Join theater, band, choir, debate or the school paper", "Enter a writing, art or film contest", "Start a podcast, blog or video channel about something you love"]
+    }
+  };
+  var ORDER = ["det", "heal", "arch", "story"];
+
+  var QUESTIONS = [
+    { domain: "Free time", q: "It’s a free Saturday. You’re most likely…", a: [
+      ["arch", "Building something: coding a game, a robotics kit, a LEGO masterpiece"],
+      ["det", "Deep in a rabbit hole: a mystery podcast, a true-crime doc, a Wikipedia spiral"],
+      ["story", "Making something creative: writing, drawing, music, filming videos"],
+      ["heal", "Out helping people: coaching little kids, volunteering, looking after a sibling"]]},
+    { domain: "School", q: "It’s dissection day in biology. You’re…", a: [
+      ["det", "Fascinated. You want to find every structure and figure out what went wrong."],
+      ["story", "Narrating the whole thing like a nature documentary"],
+      ["heal", "Hands-on and steady, helping your squeamish lab partner through it"],
+      ["arch", "Seeing the body as a machine: levers, pumps and pipes"]]},
+    { domain: "Teamwork", q: "In a group project, you’re the one who…", a: [
+      ["heal", "Checks in on everyone and steps up when someone’s overwhelmed"],
+      ["arch", "Builds the spreadsheet, model or timeline that makes it all work"],
+      ["det", "Fact-checks everything and catches the mistake nobody else saw"],
+      ["story", "Writes the script and wows the class during the presentation"]]},
+    { domain: "Entertainment", q: "Pick your next binge-watch:", a: [
+      ["story", "A musical, a period drama, or anything with unforgettable characters"],
+      ["heal", "A hospital drama where every episode is a crisis"],
+      ["arch", "A show about mega-builds: skyscrapers, rockets, giant bridges"],
+      ["det", "A mystery you try to solve before the detective does"]]},
+    { domain: "Problem-solving", q: "Your phone dies and you’re lost in a new city. You…", a: [
+      ["heal", "Spot a tourist who looks even more lost, and help them first"],
+      ["det", "Read the clues: street signs, landmarks, the map at the bus stop"],
+      ["arch", "Rig up a way to charge it with whatever you can find"],
+      ["story", "Treat it like an adventure that’ll make a great story later"]]},
+    { domain: "Food", q: "You’re trying a new restaurant. You…", a: [
+      ["story", "Judge it on the vibe: the music, the décor, the story behind the place"],
+      ["arch", "Find the best deal, then split the bill down to the cent"],
+      ["det", "Read the whole menu (and the reviews) before deciding"],
+      ["heal", "Make sure everyone, even the picky eater, gets something they like"]]},
+    { domain: "Your future", q: "Your dream workday just ended. You’re thinking…", a: [
+      ["det", "“I figured out what nobody else could.”"],
+      ["heal", "“I helped someone feel better today.”"],
+      ["story", "“I moved people with something I created.”"],
+      ["arch", "“I designed something that works better than anything before it.”"]]}
+  ];
+
+  var LETTERS = ["A", "B", "C", "D"];
+  var app = document.getElementById("app");
+  var state = { step: -1, picks: [], shuffled: [] };
+  var keyHandler = null;
+
+  function shuffle(list) {
+    var a = list.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  function setKeys(fn) {
+    if (keyHandler) document.removeEventListener("keydown", keyHandler);
+    keyHandler = fn;
+    if (fn) document.addEventListener("keydown", fn);
+  }
+
+  function focusHeading() {
+    var h = app.querySelector("[data-focus]");
+    if (h) h.focus({ preventScroll: true });
+    window.scrollTo(0, 0);
+  }
+
+  function setHash(h) {
+    try { history.replaceState(null, "", h ? "#" + h : location.pathname + location.search); } catch (e) {}
+  }
+
+  /* ---------- Start screen ---------- */
+  function renderStart() {
+    document.body.className = "dark";
+    setHash("");
+    var tiles = ORDER.map(function (k) {
+      return '<div class="tile" style="background:' + TYPES[k].color + ';color:var(--cream)">' + ICONS[k] + '</div>';
+    }).join("");
+    app.innerHTML =
+      '<section class="start fade">' +
+        '<p class="eyebrow">Careers in Pathology</p>' +
+        '<h1 tabindex="-1" data-focus>Is Pathology<br>Right for You?</h1>' +
+        '<p class="lede">Seven quick questions. Four possible results. Are you a Medical Detective, a Healer, an Architect or a Storyteller?</p>' +
+        '<div class="tiles" aria-hidden="true">' + tiles + '</div>' +
+        '<div class="actions">' +
+          '<button class="btn" id="go">Start the quiz →</button>' +
+          '<span class="hint">Go with your gut. There are no wrong answers.</span>' +
+        '</div>' +
+      '</section>';
+    document.getElementById("go").addEventListener("click", startQuiz);
+    setKeys(function (e) { if (e.key === "Enter") { e.preventDefault(); startQuiz(); } });
+    focusHeading();
+  }
+
+  function startQuiz() {
+    state.step = 0;
+    state.picks = [];
+    state.shuffled = QUESTIONS.map(function (q) { return shuffle(q.a); });
+    renderQuestion();
+  }
+
+  /* ---------- Question screen ---------- */
+  function renderQuestion() {
+    document.body.className = "";
+    var i = state.step, q = QUESTIONS[i], opts = state.shuffled[i];
+    var pct = Math.round((i / QUESTIONS.length) * 100);
+    var answers = opts.map(function (o, n) {
+      var chosen = state.picks[i] === o[0] ? " chosen" : "";
+      return '<button class="answer' + chosen + '" data-type="' + o[0] + '">' +
+               '<span class="badge" aria-hidden="true">' + LETTERS[n] + '</span>' +
+               '<span><span class="sr-only" style="position:absolute;left:-9999px">Option ' + LETTERS[n] + ': </span>' + o[1] + '</span>' +
+             '</button>';
+    }).join("");
+    app.innerHTML =
+      '<section class="question fade">' +
+        '<div class="topbar">' +
+          '<div class="progress" role="progressbar" aria-label="Quiz progress" aria-valuemin="0" aria-valuemax="' + QUESTIONS.length + '" aria-valuenow="' + i + '"><span style="width:' + pct + '%"></span></div>' +
+          '<span class="count">' + (i + 1) + ' / ' + QUESTIONS.length + '</span>' +
+        '</div>' +
+        '<p class="eyebrow">Question ' + (i + 1) + ' of ' + QUESTIONS.length + ' · ' + q.domain + '</p>' +
+        '<h2 tabindex="-1" data-focus>' + q.q + '</h2>' +
+        '<div class="answers">' + answers + '</div>' +
+        '<div class="qfoot">' +
+          (i > 0 ? '<button class="link-btn" id="back">← Back</button>' : '<button class="link-btn" id="back">← Start over</button>') +
+          '<span class="keys">Tip: press <kbd>A</kbd>–<kbd>D</kbd> or <kbd>1</kbd>–<kbd>4</kbd> to answer</span>' +
+        '</div>' +
+      '</section>';
+
+    Array.prototype.forEach.call(app.querySelectorAll(".answer"), function (b) {
+      b.addEventListener("click", function () { choose(b.getAttribute("data-type"), b); });
+    });
+    document.getElementById("back").addEventListener("click", goBack);
+    setKeys(function (e) {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      var k = e.key.toLowerCase();
+      var idx = "abcd".indexOf(k);
+      if (idx < 0) idx = "1234".indexOf(k);
+      if (idx >= 0 && k.length === 1) {
+        e.preventDefault();
+        var btn = app.querySelectorAll(".answer")[idx];
+        if (btn) choose(btn.getAttribute("data-type"), btn);
+      } else if (e.key === "ArrowLeft" || e.key === "Backspace") {
+        e.preventDefault(); goBack();
+      }
+    });
+    focusHeading();
+  }
+
+  var locked = false;
+  function choose(type, btn) {
+    if (locked) return;
+    locked = true;
+    state.picks[state.step] = type;
+    Array.prototype.forEach.call(app.querySelectorAll(".answer"), function (b) { b.classList.remove("chosen"); });
+    btn.classList.add("chosen");
+    var bar = app.querySelector(".progress span");
+    if (bar) bar.style.width = Math.round(((state.step + 1) / QUESTIONS.length) * 100) + "%";
+    setTimeout(function () {
+      locked = false;
+      state.step++;
+      if (state.step >= QUESTIONS.length) renderResult(score(), true);
+      else renderQuestion();
+    }, 320);
+  }
+
+  function goBack() {
+    if (state.step <= 0) { renderStart(); return; }
+    state.step--;
+    renderQuestion();
+  }
+
+  /* ---------- Scoring ---------- */
+  function score() {
+    var counts = { det: 0, heal: 0, arch: 0, story: 0 };
+    state.picks.forEach(function (t) { counts[t]++; });
+    var max = Math.max.apply(null, ORDER.map(function (k) { return counts[k]; }));
+    var tied = ORDER.filter(function (k) { return counts[k] === max; });
+    var winner = tied[0];
+    if (tied.length > 1) {
+      // Tie-breaker: your answer to Question 7, then the latest answer among the tied types.
+      for (var i = state.picks.length - 1; i >= 0; i--) {
+        if (tied.indexOf(state.picks[i]) >= 0) { winner = state.picks[i]; break; }
+      }
+    }
+    return { winner: winner, counts: counts, tie: tied.length > 1 };
+  }
+
+  /* ---------- Result screen ---------- */
+  function detailHTML(k) {
+    var t = TYPES[k];
+    function li(arr) { return arr.map(function (x) { return "<li>" + x + "</li>"; }).join(""); }
+    return '<div class="grid2">' +
+        '<div class="panel"><h3 style="color:' + t.color + '">You’re someone who…</h3><ul>' + li(t.traits) + '</ul></div>' +
+        '<div class="panel"><h3 style="color:' + t.color + '">Careers you’d love</h3><ul>' + li(t.careers) + '</ul></div>' +
+      '</div>' +
+      '<div class="panel full"><h3 style="color:' + t.color + '">' + t.bandTitle + '</h3><ul>' + li(t.band) + '</ul></div>';
+  }
+
+  function heroHTML(k, label) {
+    var t = TYPES[k];
+    return '<div class="result-hero" style="background:' + t.color + '">' +
+        '<div class="icon" style="color:' + t.color + '">' + ICONS[k] + '</div>' +
+        '<div><p class="you">' + label + '</p>' +
+        '<h1 tabindex="-1" data-focus>' + t.name + '</h1>' +
+        '<p class="tagline">' + t.tagline + '</p></div>' +
+      '</div>';
+  }
+
+  function renderResult(res, animate) {
+    document.body.className = "";
+    var k = res.winner, t = TYPES[k];
+    setHash(t.slug);
+    var mix = "";
+    if (res.counts) {
+      var rows = ORDER.slice().sort(function (a, b) { return res.counts[b] - res.counts[a]; }).map(function (x) {
+        var c = res.counts[x];
+        return '<div class="row"><span>' + TYPES[x].short + '</span>' +
+               '<div class="bar" aria-hidden="true"><div class="bar-fill" data-w="' + Math.round((c / QUESTIONS.length) * 100) + '" style="background:' + TYPES[x].color + '"></div></div>' +
+               '<span class="num">' + c + '/' + QUESTIONS.length + '</span></div>';
+      }).join("");
+      mix = '<div class="panel mix"><h3>Your mix</h3>' + rows +
+            (res.tie ? '<p class="note">It was a tie, so we went with your answer to the last question.</p>' : '') +
+            '</div>';
+    }
+    var chips = ORDER.map(function (x) {
+      return '<button class="chip" data-k="' + x + '" aria-pressed="' + (x === k) + '"><span class="dot" style="background:' + TYPES[x].color + '"></span>' + TYPES[x].short + (x === res.winner && res.counts ? " (you)" : "") + '</button>';
+    }).join("");
+
+    app.innerHTML =
+      '<section class="fade">' +
+        '<div id="hero">' + heroHTML(k, res.counts ? "You’re…" : "Result") + '</div>' +
+        '<div id="detail">' + detailHTML(k) + '</div>' +
+        mix +
+        '<div class="explore"><span class="label">Explore all four:</span>' + chips + '</div>' +
+        '<div class="verdict">' +
+          '<div class="tile" style="background:var(--det);color:var(--cream)">' + ICONS.det + '</div>' +
+          '<div><h3>Your result is a clue, not a verdict.</h3>' +
+          '<p>Most people are a mix, so check your second-highest score too. Curious what a Medical Detective’s day looks like? That’s what pathology is all about.</p></div>' +
+        '</div>' +
+        '<div class="result-actions">' +
+          '<button class="btn primary" id="again">↺ Take it again</button>' +
+          '<button class="btn ghost" id="home">Back to start</button>' +
+        '</div>' +
+      '</section>';
+
+    Array.prototype.forEach.call(app.querySelectorAll(".chip"), function (c) {
+      c.addEventListener("click", function () {
+        var x = c.getAttribute("data-k");
+        Array.prototype.forEach.call(app.querySelectorAll(".chip"), function (o) { o.setAttribute("aria-pressed", String(o === c)); });
+        var label = (x === res.winner && res.counts) ? "You’re…" : "Exploring";
+        document.getElementById("hero").innerHTML = heroHTML(x, label);
+        document.getElementById("detail").innerHTML = detailHTML(x);
+      });
+    });
+    document.getElementById("again").addEventListener("click", startQuiz);
+    document.getElementById("home").addEventListener("click", renderStart);
+    setKeys(null);
+    focusHeading();
+    requestAnimationFrame(function () {
+      setTimeout(function () {
+        Array.prototype.forEach.call(app.querySelectorAll(".bar-fill"), function (b) { b.style.width = b.getAttribute("data-w") + "%"; });
+      }, animate ? 150 : 0);
+    });
+  }
+
+  /* ---------- Boot: a link like .../#healer opens that result directly ---------- */
+  var h = (location.hash || "").replace("#", "").toLowerCase();
+  var direct = ORDER.filter(function (k) { return TYPES[k].slug === h; })[0];
+  if (direct) renderResult({ winner: direct, counts: null, tie: false }, false);
+  else renderStart();
+})();
+</script>
+</body>
+</html>
