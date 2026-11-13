@@ -150,6 +150,20 @@
 (function () {
   "use strict";
 
+  /* ============ SETTINGS ============
+     Paste your Google Apps Script web app URL between the quotes to collect
+     anonymous results in your Google Sheet. Leave it empty to collect nothing. */
+  var RESULTS_ENDPOINT = "https://script.google.com/macros/s/AKfycbww4A8CxaUTHEXmH3bI3TFHSfzXSN0Pn8PHj864Rn0xwK01INXw5ecVdPLDF6UnuYl9/exec";
+  /* Optional: tag responses by audience with a link like
+     https://you.github.io/pathology-quiz/?event=hamden-high               */
+  var EVENT_TAG = (function () {
+    try {
+      var v = new URLSearchParams(location.search).get("event") || "";
+      return v.replace(/[^A-Za-z0-9 _-]/g, "").slice(0, 40);
+    } catch (e) { return ""; }
+  })();
+  /* ================================== */
+
   var ICONS = {
     det: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg>',
     heal: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12h4l3-8 5 16 3-8h4"/></svg>',
@@ -278,6 +292,7 @@
           '<button class="btn" id="go">Start the quiz →</button>' +
           '<span class="hint">Go with your gut. There are no wrong answers.</span>' +
         '</div>' +
+        (RESULTS_ENDPOINT ? '<p class="hint">Results are counted anonymously. No names or personal information are collected.</p>' : '') +
       '</section>';
     document.getElementById("go").addEventListener("click", startQuiz);
     setKeys(function (e) { if (e.key === "Enter") { e.preventDefault(); startQuiz(); } });
@@ -350,8 +365,11 @@
     setTimeout(function () {
       locked = false;
       state.step++;
-      if (state.step >= QUESTIONS.length) renderResult(score(), true);
-      else renderQuestion();
+      if (state.step >= QUESTIONS.length) {
+        var res = score();
+        report(res);
+        renderResult(res, true);
+      } else renderQuestion();
     }, 320);
   }
 
@@ -375,6 +393,31 @@
       }
     }
     return { winner: winner, counts: counts, tie: tied.length > 1 };
+  }
+
+  /* ---------- Anonymous reporting (no names, no IDs, no cookies) ---------- */
+  function report(res) {
+    if (!RESULTS_ENDPOINT) return;
+    var payload = {
+      result: TYPES[res.winner].slug,
+      detective: res.counts.det,
+      healer: res.counts.heal,
+      architect: res.counts.arch,
+      storyteller: res.counts.story,
+      tie: res.tie,
+      answers: state.picks.map(function (t) { return TYPES[t].slug; }),
+      event: EVENT_TAG
+    };
+    try {
+      // text/plain + no-cors avoids a CORS preflight, which Apps Script doesn't answer.
+      fetch(RESULTS_ENDPOINT, {
+        method: "POST",
+        mode: "no-cors",
+        keepalive: true,
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+      }).catch(function () {});
+    } catch (e) {}
   }
 
   /* ---------- Result screen ---------- */
